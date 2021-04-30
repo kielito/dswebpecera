@@ -9,9 +9,9 @@ class UserModel {
 	async config() {//Parametro de conexion con la BD.
 		this.db = await createPool({
 			host: 'us-cdbr-east-03.cleardb.com',
-			user: 'b0e0fd43ed8818',
-			password:'2b1f9d39',
-			database: 'heroku_4505cc56058eb11',
+			user: 'b06ce98510d652',
+			password:'4008bb12',
+			database: 'heroku_c5c297f49b2700c',
 			connectionLimit: 10
 		});
 	}
