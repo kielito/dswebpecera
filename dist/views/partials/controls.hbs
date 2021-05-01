@@ -10,7 +10,7 @@
         <td>{{Id}}</td>
         <td>{{Usuario}}</td>
         <td>{{Password}}</td>
-        <td><a class="btn btn-success" href="/user/update/{{id}}">Modificar</a><a class="btn btn-danger" href="/user/delete/{{id}}">Eliminar</a></td>
+        <td><a class="btn btn-danger" href="/user/delete/{{Id}}">Eliminar</a></td>
     </tr>
     {{else}}
     <tr>
@@ -30,7 +30,7 @@
         {{#each users}}
         <tr>
             <td>
-                <input type="checkbox" name="usuario" value="{{id}}">
+                <input type="checkbox" name="usuario" value="{{Id}}">
             </td>
             <td>{{Id}}</td>
             <td>{{Usuario}}</td>
