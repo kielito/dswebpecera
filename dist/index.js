@@ -49,6 +49,8 @@ class Server {
         // Paso 11 - mensajes de sesion error es una variable que definiremos en flash y despues se la pasaremos a la variable global error para que este disponible en todas las vistas
         this.app.use((req, res, next) => {
             this.app.locals.error_session = req.flash('error_session');
+            this.app.locals.usuario_crud = req.flash('usuario_crud');
+            this.app.locals.error = req.flash('error');
             next();
         });
     }

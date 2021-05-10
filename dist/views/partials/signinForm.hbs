@@ -1,3 +1,31 @@
+{{#if error_session}}
+<div class="container p-4">
+    <div class="row">
+        <div class="col-md-4 mx-auto">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{error_session}}
+                <button type="button" class="close" data-dismiss='alert' aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{{/if}}
+{{#if usuario_crud}}
+<div class="container p-4">
+    <div class="row">
+        <div class="col-md-4 mx-auto">
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                {{usuario_crud}}
+                <button type="button" class="close" data-dismiss='alert' aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{{/if}}
 <body style="background-color: #d1ffe2;">
     <div class="container p-4">
         <div class="row">
@@ -10,10 +38,10 @@
                         <form action="../user/signin" method="post">  {{!-- Paso 13 --}}
                             <div class="form-group"> {{!-- Paso 24 --}}
                                 </br>{{!-- Paso 14 --}}
-                                <input class="form-control" type="text" name="usuario" placeholder="Usuario" autofocus>
+                                <input class="form-control" type="text" name="usuario" placeholder="Usuario" required autofocus>
                                 <!--name: nombre de la variable, placeholder: etiqueta-->
                                 </br>
-                                <input class="form-control" type="password" name="password" placeholder="Contraseña">
+                                <input class="form-control" type="password" name="password" placeholder="Contraseña" required>
                                 </br>
                                 <button class="btn btn-primary btn-block">Enviar</button>
                             </div>

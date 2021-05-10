@@ -28,7 +28,7 @@ class UserController {
             if (!result) {
                 // res.send({ "Usuario no registrado ": req.body }); // Paso 13 sacamos todos los send!!
                 req.flash('error_session', 'Usuario no registrado'); // Paso 13 (agregue llaves y else if)
-                res.redirect("./error"); // Paso 13
+                res.redirect("./signin"); // Paso 13
             }
             else if (result.Usuario == usuario && result.Password == password) {
                 req.session.user = result; // Paso 5  guardo datos de bd en objeto user
@@ -39,17 +39,15 @@ class UserController {
             else {
                 // res.send({ "Usuario y/o contraseña incorrectos": req.body }); // Paso 13 sacamos todos los send!!
                 req.flash('error_session', 'Usuario y/o Password Incorrectos'); // Paso 13
-                res.redirect("./error"); // Paso 13
+                res.redirect("./signin"); // Paso 13
             }
         });
     }
     //registro
     signup(req, res) {
         console.log(req.body);
-        //res.send('Sign Up!!!');
         res.render("partials/signupForm");
     }
-    // Paso 14
     showError(req, res) {
         //res.send({ "Usuario y/o contraseña incorrectos": req.body }); // Paso 15
         res.render("partials/error"); // Paso 15
@@ -93,9 +91,15 @@ class UserController {
             const busqueda = yield userModel_1.default.buscarUsuario(usuario.Usuario);
             if (!busqueda) {
                 const result = yield userModel_1.default.crear(usuario);
-                return res.json({ message: 'User saved!!' });
+                req.flash('usuario_crud', 'Usuario creado.');
+                res.redirect("./signin");
+                return;
             }
-            return res.json({ message: 'User exists!!' });
+            else {
+                req.flash('usuario_crud', 'El usuario ya existe.');
+                res.redirect("./signin");
+                return;
+            }
         });
     }
     update(req, res) {
@@ -159,7 +163,7 @@ class UserController {
             //res.send('Datos recibidos!!!');
         });
     }
-    // Paso 8 cierre de sesion
+    // cierre de sesion
     endSession(req, res) {
         console.log(req.body);
         req.session.user = {};

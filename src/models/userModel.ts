@@ -33,6 +33,7 @@ class UserModel {
 			return encontrado[0][0];
 		return null;
 	}
+	
 	//Devuelve un objeto cuya fila en la tabla usuarios coincide con nombre.
 	//Si no la encuentra devuelve null
 	async buscarUsuario(usuario: string) {
