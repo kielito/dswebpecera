@@ -1,1 +1,31 @@
-<a class="btn btn-success" href="/user/control">Controles</a>
+{{!-- Paso 34 --}}
+<body style="background-color: #d1ffe2;">
+    <div class="container p-4">
+        <div class="row">
+            <div class="col-md-4 mx-auto">
+                <div class="card text-center">
+                    <div class="card-header">
+                        <h3>Bienvenido {{usuarios.nombre}}</h3>
+                    </div>
+                    <div class="card-body">
+                        {{!-- Paso 35 
+                        <form action="../user/home" method="post">
+                            <div class="form-group">
+                                {{#each usuarios}}
+                                    <div class="form-group">
+                                        <input type="radio" name="usuario" value="{{nombre}}">
+                                        <td>{{nombre}}</td> 
+                                        <label for="{{usuarios}}">{{usuarios}}</label>
+                                    </div>
+                                {{/each}}
+                                <button class="btn btn-success btn-block">Enviar</button>
+                                </br>--}}
+                                <a class="btn btn-success btn-block" href="/user/control">Controles</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>

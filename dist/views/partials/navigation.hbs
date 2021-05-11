@@ -10,18 +10,20 @@
     <a class="navbar-brand" href="../">Pecera SA</a>
     <div class="collapse navbar-collapse" id="navbarNavDropdown">
       <ul class="navbar-nav ml-auto">
-        {{#if user}} {{!-- Si el usuario esta logueado se muestra la navegacion --}}
-        
-        <li class="nav-item">
-          <a class="nav-link" href="/user/logout">Cerrar Sesión</a>
-        </li>
+       {{#if login}} {{!-- Si el usuario esta logueado se muestra la navegacion --}}          
+          <li class="nav-item">
+            <a class="nav-link" href="/user/home">Perfil</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/user/salir">Cerrar Sesión</a>
+          </li>
         {{else}}{{!-- Si el usuario no esta logueado mostrara en la barra --}}
-        <li class="nav-item">
-          <a class="nav-link" href="/user/signin">Iniciar Sesión</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/user/signup">Registrarse</a>
-        </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/user/signin">Iniciar Sesión</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/user/signup">Registrarse</a>
+          </li>
         {{/if}}
       </ul>
     </div>

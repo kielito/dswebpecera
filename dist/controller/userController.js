@@ -21,25 +21,25 @@ class UserController {
     login(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { usuario, password } = req.body; // hacemos detrucsturing y obtenemos el ID. Es decir, obtenemos una parte de un objeto JS.
-            const result = yield userModel_1.default.buscarUsuario(usuario);
-            console.log(usuario);
-            console.log(password);
-            console.log(result);
+            const result = yield userModel_1.default.buscarNombre(usuario);
             if (!result) {
-                // res.send({ "Usuario no registrado ": req.body }); // Paso 13 sacamos todos los send!!
-                req.flash('error_session', 'Usuario no registrado'); // Paso 13 (agregue llaves y else if)
-                res.redirect("./signin"); // Paso 13
-            }
-            else if (result.Usuario == usuario && result.Password == password) {
-                req.session.user = result; // Paso 5  guardo datos de bd en objeto user
-                req.session.auth = true; // Paso 5 variable de sesion usuario autenticado
-                res.redirect("./home");
-                return;
+                req.flash('error', 'El Usuario no se encuentra registrado'); //Dos parametros: primero variable, segundo el valor que tendra esa variable
+                res.redirect("./signin");
             }
             else {
-                // res.send({ "Usuario y/o contraseña incorrectos": req.body }); // Paso 13 sacamos todos los send!!
-                req.flash('error_session', 'Usuario y/o Password Incorrectos'); // Paso 13
-                res.redirect("./signin"); // Paso 13
+                const correctPassword = yield userModel_1.default.validarPassword(password, result.Password);
+                console.log(result);
+                if (correctPassword) {
+                    req.session.user = result;
+                    req.session.auth = true;
+                    req.flash('confirmacion', 'Bienvenido ' + result.Nombre + '!!');
+                    res.redirect("./home");
+                    return;
+                }
+                else {
+                    req.flash('error', 'Password Incorrecto'); //Dos parametros: primero variable, segundo el valor que tendra esa variable
+                    res.redirect("./signin");
+                }
             }
         });
     }
@@ -56,9 +56,8 @@ class UserController {
         console.log(req.body);
         // Paso 6 si no fue autenticado envialo a la ruta principal
         if (!req.session.auth) {
-            //res.redirect("/"); Paso 17
-            req.flash('error_session', 'Debes iniciar sesion para ver esta seccion'); // Paso 17
-            res.redirect("./error"); // Paso 17
+            req.flash('error', 'Debes iniciar sesion para ver esta seccion!');
+            res.redirect("./signin");
         }
         res.render("partials/home", { mi_session: true }); // Paso 18  debemos enviar mi_session en true para que se dibuje el boton	
     }
@@ -79,93 +78,88 @@ class UserController {
             const usuario = yield userModel_1.default.buscarId(id);
             if (usuario)
                 return res.json(usuario);
-            res.status(404).json({ text: "User doesn't exists" });
+            return req.flash('error', 'Usuario no existe!');
         });
     }
     addUser(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const usuario = req.body;
+            if (usuario.password !== usuario.repassword) {
+                req.flash('error', 'Verifique la clave ingresada!'); //Dos parametros: primero variable, segundo el valor que tendra esa variable
+                return res.redirect("./signup");
+            }
             delete usuario.repassword;
-            console.log(req.body);
-            //res.send('Usuario agregado!!!');
-            const busqueda = yield userModel_1.default.buscarUsuario(usuario.Usuario);
+            const busqueda = yield userModel_1.default.buscarUsuario(usuario.usuario, usuario.email);
+            usuario.password = yield userModel_1.default.encriptarPassword(usuario.password);
+            console.log(busqueda);
             if (!busqueda) {
                 const result = yield userModel_1.default.crear(usuario);
-                req.flash('usuario_crud', 'Usuario creado.');
-                res.redirect("./signin");
-                return;
+                if (!result)
+                    res.status(404).json({ text: "No se pudo crear el usuario" });
+                req.flash('confirmacion', 'Usuario Registrado correctamente!');
+                return res.redirect("./signin");
             }
-            else {
-                req.flash('usuario_crud', 'El usuario ya existe.');
-                res.redirect("./signin");
-                return;
-            }
+            req.flash('error', 'El usuario y/o email ya se encuentra registrado!'); //Dos parametros: primero variable, segundo el valor que tendra esa variable
+            return res.redirect("./signup");
         });
     }
     update(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(req.body);
+            if (!req.session.auth) {
+                req.flash('error', 'Debe iniciar sesion para ver esta seccion'); //Dos parametros: primero variable, segundo el valor que tendra esa variable
+                res.redirect("../signin");
+            }
             const { id } = req.params;
+            const usuario = yield userModel_1.default.buscarId(id);
+            req.body.password = yield userModel_1.default.encriptarPassword(req.body.password);
             const result = yield userModel_1.default.actualizar(req.body, id);
-            //res.send('Usuario '+ req.params.id +' actualizado!!!');
-            return res.json({ text: 'updating a user ' + id });
+            if (result) {
+                req.flash('confirmacion', 'Usuario "' + req.body.nombre + '" actualizado correctamente!');
+                return res.redirect("../control");
+            }
+            req.flash('error', 'El usuario y/o email ya se encuentra registrado!'); //Dos parametros: primero variable, segundo el valor que tendra esa variable
+            return res.render("partials/update", { usuario, home: req.session.user, mi_session: true });
         });
     }
     delete(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(req.body);
-            //res.send('Usuario '+ req.params.id +' Eliminado!!!');
+            if (!req.session.auth) {
+                req.flash('error', 'Debe iniciar sesion para ver esta seccion'); //Dos parametros: primero variable, segundo el valor que tendra esa variable
+                res.redirect("../signin");
+            }
             const { id } = req.params; // hacemos detrucsturing y obtenemos el ID. Es decir, obtenemos una parte de un objeto JS.
             const result = yield userModel_1.default.eliminar(id);
-            //return res.json({ text: 'deleting a user ' + id });
-            res.redirect('../control'); // Paso 19 redirije despues del delete a la vista de la tabla
+            console.log(req.body);
+            req.flash('confirmacion', 'Se eliminó el Usuario correctamente!');
+            res.redirect('../control');
         });
     }
     //FIN CRUD
     control(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            //res.send('Controles');
-            // Paso 6 si no fue autenticado envialo a la ruta principal
             if (!req.session.auth) {
-                // res.redirect("/"); Paso 17
-                req.flash('error_session', 'Debes iniciar sesion para ver esta seccion'); // Paso 17
-                res.redirect("./error"); // Paso 17
+                req.flash('error', 'Debe iniciar sesion para ver esta seccion'); //Dos parametros: primero variable, segundo el valor que tendra esa variable
+                res.redirect("./signin");
             }
             const usuarios = yield userModel_1.default.listar();
-            const users = usuarios;
-            res.render('partials/controls', { users: usuarios, mi_session: true }); //  Paso 18  debemos enviar mi_session en true para que se dibuje el boton		
+            res.render('partials/controls', { users: usuarios, mi_session: true });
         });
     }
     procesar(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(req.body);
-            // Paso 6 si no fue autenticado envialo a la ruta principal
             if (!req.session.auth) {
-                // res.redirect("/"); Paso 17
-                req.flash('error_session', 'Debes iniciar sesion para ver esta seccion'); // Paso 17
-                res.redirect("./error"); // Paso 17
+                req.flash('error', 'Debes iniciar sesion para ver esta seccion');
+                return res.redirect("../signin");
             }
-            // Paso 20
-            let usuario = req.body.usuario;
-            var usuarios = [];
-            console.log(usuario);
-            if (usuario !== undefined) { // Falla comprobacion cuando envio vacio
-                for (let elemento of usuario) {
-                    const encontrado = yield userModel_1.default.buscarId(elemento);
-                    if (encontrado) {
-                        usuarios.push(encontrado);
-                        console.log(encontrado);
-                    }
-                }
+            const { id } = req.params; // hacemos detrucsturing y obtenemos el ID. Es decir, obtenemos una parte de un objeto JS.
+            const usuario = yield userModel_1.default.buscarId(id);
+            if (usuario !== undefined) {
+                res.render("partials/update", { usuario, home: req.session.user, mi_session: true });
             }
-            console.log(usuarios);
-            res.render("partials/seleccion", { usuarios, home: req.session.user, mi_session: true }); // Paso 21 renderizamos la vista y paso 22
-            //res.send('Datos recibidos!!!');
         });
     }
     // cierre de sesion
     endSession(req, res) {
-        console.log(req.body);
         req.session.user = {};
         req.session.auth = false;
         req.session.destroy(() => console.log("Session finalizada"));

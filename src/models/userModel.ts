@@ -1,4 +1,5 @@
 import { createPool } from 'mysql2/promise';
+import  bcryptjs from 'bcryptjs';
 
 class UserModel {
 	private db: any;
@@ -9,9 +10,9 @@ class UserModel {
 	async config() {//Parametro de conexion con la BD.
 		this.db = await createPool({
 			host: 'us-cdbr-east-03.cleardb.com',
-			user: 'b06ce98510d652',
-			password:'4008bb12',
-			database: 'heroku_c5c297f49b2700c',
+			user: 'b0e0fd43ed8818',
+			password:'2b1f9d39',
+			database: 'heroku_4505cc56058eb11',
 			connectionLimit: 10			
 		});
 	}
@@ -33,11 +34,22 @@ class UserModel {
 			return encontrado[0][0];
 		return null;
 	}
+
+
+	//Devuelve un objeto cuya fila en la tabla usuarios coincide con nombre.
+	//Si no la encuentra devuelve null
+	async buscarNombre(nombre: string) {
+		const encontrado: any = await this.db.query('SELECT * FROM usuario WHERE Usuario = ?', [nombre]);
+		//Ojo la consulta devuelve una tabla de una fila. (Array de array) Hay que desempaquetar y obtener la unica fila al enviar
+		if (encontrado.length > 1)
+			return encontrado[0][0];
+		return null;
+	}
 	
 	//Devuelve un objeto cuya fila en la tabla usuarios coincide con nombre.
 	//Si no la encuentra devuelve null
-	async buscarUsuario(usuario: string) {
-		const encontrado: any = await this.db.query('SELECT * FROM usuario WHERE Usuario = ?', [usuario]);
+	async buscarUsuario(usuario: string, email: string) {
+		const encontrado: any = await this.db.query('SELECT * FROM usuario WHERE Usuario = ? OR Email = ?', [usuario,email]);
 		//Ojo la consulta devuelve una tabla de una fila. (Array de array) Hay que desempaquetar y obtener la unica fila al enviar
 		if (encontrado.length > 1)
 			return encontrado[0][0];
@@ -64,6 +76,18 @@ class UserModel {
 		console.log(user);
 		return user;
 	}
+
+
+	//Encriptar Clave
+	encriptarPassword = async(password: string): Promise<string> => {
+        const salt = await bcryptjs.genSalt(10);
+        return await bcryptjs.hash(password, salt);
+    }
+
+	//Compara la Clave ingresada vs la registrada
+	validarPassword = async function (password: string, passwordhash: string): Promise<boolean> {		
+        return await bcryptjs.compare(password, passwordhash);
+    }
 }
 
 //Exportamos el enrutador con 
